@@ -25,7 +25,7 @@ public:
 
 	int waitForConnection(int socketFileDescriptor);
 
-	SocketBuf receive_data(int fileDescriptor, int noOfBytes);
+	SocketBuf receiveData(int fileDescriptor, int noOfBytes);
 
 	int sendData(int fileDescriptor, const SocketBuf& socketBuf);
 

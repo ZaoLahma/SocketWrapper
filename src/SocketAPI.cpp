@@ -133,7 +133,7 @@ int SocketAPI::connect(const std::string& address, const std::string& portNo) {
     return sockfd;
 }
 
-SocketBuf SocketAPI::receive_data(int fileDescriptor, int noOfBytes) {
+SocketBuf SocketAPI::receiveData(int fileDescriptor, int noOfBytes) {
 	SocketBuf retVal;
 	retVal.data = new char[noOfBytes];
 	retVal.dataSize = noOfBytes;

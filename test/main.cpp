@@ -15,7 +15,7 @@ int main(void) {
 
 	int clientSocket = socket.waitForConnection(serverSocket);
 
-	SocketBuf data = socket.receive_data(clientSocket, 6);
+	SocketBuf data = socket.receiveData(clientSocket, 6);
 
 	for(unsigned int i = 0; i < data.dataSize; ++i)
 	{
@@ -24,7 +24,7 @@ int main(void) {
 
 	socket.sendData(clientSocket, data);
 
-	socket.receive_data(clientSocket, 1);
+	socket.receiveData(clientSocket, 1);
 
 	delete data.data;
 
