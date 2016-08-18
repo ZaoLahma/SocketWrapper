@@ -12,7 +12,7 @@
 
 struct SocketBuf
 {
-	int dataSize;
+	unsigned int dataSize;
 	char* data;
 };
 
@@ -21,7 +21,9 @@ class SocketAPI
 public:
 	int connect(const std::string& address, const std::string& portNo);
 
-	int waitForConnection(const std::string& address, const std::string& portNo);
+	int getServerSocketFileDescriptor(const std::string& portNo);
+
+	int waitForConnection(int socketFileDescriptor);
 
 	SocketBuf receive_data(int fileDescriptor, int noOfBytes);
 
@@ -30,7 +32,6 @@ public:
 protected:
 
 private:
-	int socketFd;
 };
 
 
