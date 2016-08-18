@@ -78,7 +78,7 @@ int SocketAPI::getServerSocketFileDescriptor(const std::string& portNo) {
 }
 
 int SocketAPI::waitForConnection(int socketFileDescriptor) {
-	struct sockaddr_storage their_addr; // connector's address information
+	struct sockaddr_storage their_addr;
     socklen_t sin_size;
 
     printf("server: waiting for connections...\n");
@@ -86,10 +86,11 @@ int SocketAPI::waitForConnection(int socketFileDescriptor) {
 	sin_size = sizeof their_addr;
 	int new_fd = accept(socketFileDescriptor, (struct sockaddr *)&their_addr, &sin_size);
 
+	printf("server: got new connection...\n");
     return new_fd;
 }
 
-int SocketAPI::connect(const std::string& address, const std::string& portNo) {
+int SocketAPI::getClientSocketFileDescriptor(const std::string& address, const std::string& portNo) {
     int sockfd;
 
     struct addrinfo hints;

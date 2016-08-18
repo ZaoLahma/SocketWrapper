@@ -19,7 +19,7 @@ struct SocketBuf
 class SocketAPI
 {
 public:
-	int connect(const std::string& address, const std::string& portNo);
+	int getClientSocketFileDescriptor(const std::string& address, const std::string& portNo);
 
 	int getServerSocketFileDescriptor(const std::string& portNo);
 
