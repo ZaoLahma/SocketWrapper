@@ -7,6 +7,7 @@
 
 #include "../inc/SocketAPI.h"
 #include <string>
+#include <thread>
 
 int main(void) {
 
@@ -16,59 +17,111 @@ int main(void) {
 
 	int clientSocket = socket.waitForConnection(serverSocket);
 
-	std::string hello_string = "220 hello, janne's ftp\r\n";
+	std::string ok_string = "200 OK.\r\n";
 
-	SocketBuf send_data;
-	send_data.dataSize = strlen(hello_string.c_str());
-	send_data.data = new char[send_data.dataSize];
+	SocketBuf sendData;
+	sendData.dataSize = strlen(ok_string.c_str());
+	sendData.data = new char[sendData.dataSize];
 
-	memcpy(send_data.data, hello_string.c_str(), send_data.dataSize);
+	memcpy(sendData.data, ok_string.c_str(), sendData.dataSize);
 
-	socket.sendData(clientSocket, send_data);
+	socket.sendData(clientSocket, sendData);
 
-	delete send_data.data;
+	delete sendData.data;
 
-	SocketBuf data = socket.receiveData(clientSocket, 12);
+	std::this_thread::sleep_for(std::chrono::milliseconds(40));
 
-	for(unsigned int i = 0; i < data.dataSize; ++i)
-	{
-		printf("Byte %d: %c\n", i, data.data[i]);
+	SocketBuf receivedData;
+	std::string buf;
+	std::string command;
+	std::string subCommand;
+	while(1){
+		receivedData = socket.receiveData(clientSocket, 1);
+		if(*receivedData.data != '\r' &&
+		   *receivedData.data != '\n' &&
+		   *receivedData.data != '\0')
+		{
+			buf += std::string(receivedData.data);
+			delete receivedData.data;
+		}
+		else
+		{
+			delete receivedData.data;
+
+			if(buf != "")
+			{
+				printf("Command received: %s\n", buf.c_str());
+				size_t pos = buf.find(' ');
+				command = buf.substr(0, pos);
+				subCommand = buf.substr(pos + 1, buf.length());
+				printf("command: %s, subCommand: %s\n", command.c_str(), subCommand.c_str());
+
+				if("USER" == command)
+				{
+					printf("Sending 230 ok\n");
+					std::string send_string = "230 OK, go ahead\r\n";
+					sendData.dataSize = strlen(send_string.c_str());
+					sendData.data = new char[sendData.dataSize];
+
+					memcpy(sendData.data, send_string.c_str(), sendData.dataSize);
+
+					socket.sendData(clientSocket, sendData);
+					std::this_thread::sleep_for(std::chrono::milliseconds(40));
+
+					delete sendData.data;
+				}
+				else if("SYST" == command)
+				{
+					printf("Sending 217 MACOS\n");
+					std::string send_string = "217 UNIX\r\n";
+					sendData.dataSize = strlen(send_string.c_str());
+					sendData.data = new char[sendData.dataSize];
+
+					memcpy(sendData.data, send_string.c_str(), sendData.dataSize);
+
+					socket.sendData(clientSocket, sendData);
+					std::this_thread::sleep_for(std::chrono::milliseconds(40));
+
+					delete sendData.data;
+				}
+				else if("QUIT" == command)
+				{
+					printf("Sending 221 QUIT response\n");
+					std::string send_string = "221 Bye Bye\r\n";
+					sendData.dataSize = strlen(send_string.c_str());
+					sendData.data = new char[sendData.dataSize];
+
+					memcpy(sendData.data, send_string.c_str(), sendData.dataSize);
+
+					socket.sendData(clientSocket, sendData);
+					std::this_thread::sleep_for(std::chrono::milliseconds(40));
+
+					delete sendData.data;
+
+					break;
+				}
+				else
+				{
+					printf("Sending 500 not implemented response\n");
+					std::string send_string = "500 UNKNOWN COMMAND\r\n";
+					sendData.dataSize = strlen(send_string.c_str());
+					sendData.data = new char[sendData.dataSize];
+
+					memcpy(sendData.data, send_string.c_str(), sendData.dataSize);
+
+					socket.sendData(clientSocket, sendData);
+					std::this_thread::sleep_for(std::chrono::milliseconds(40));
+
+					delete sendData.data;
+				}
+			}
+
+			buf = "";
+		}
 	}
 
-	delete data.data;
-
-	std::string pass_required_string = "331 Password required to access user account janne.\r\n";
-
-	send_data.dataSize = strlen(pass_required_string.c_str());
-	send_data.data = new char[send_data.dataSize];
-
-	memcpy(send_data.data, pass_required_string.c_str(), send_data.dataSize);
-
-	socket.sendData(clientSocket, send_data);
-
-	data = socket.receiveData(clientSocket, 12);
-
-		for(unsigned int i = 0; i < data.dataSize; ++i)
-		{
-			printf("Byte %d: %c\n", i, data.data[i]);
-		}
-
-		delete data.data;
-
-	delete send_data.data;
-
-	std::string logged_in_string = "230 Logged in, proceed.\r\n";
-
-	send_data.dataSize = strlen(logged_in_string.c_str());
-	send_data.data = new char[send_data.dataSize];
-
-	memcpy(send_data.data, logged_in_string.c_str(), send_data.dataSize);
-
-	socket.sendData(clientSocket, send_data);
-
-	delete send_data.data;
-
-	while(1) {}
+	socket.disconnect(clientSocket);
+	socket.disconnect(serverSocket);
 
 	return 0;
 }

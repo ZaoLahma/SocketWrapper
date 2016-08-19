@@ -29,6 +29,8 @@ public:
 
 	int sendData(int fileDescriptor, const SocketBuf& socketBuf);
 
+	void disconnect(int fileDescriptor);
+
 protected:
 
 private:
