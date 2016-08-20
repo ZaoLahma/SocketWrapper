@@ -5,9 +5,9 @@
  *      Author: janne
  */
 
-#include "../inc/SocketAPI.h"
 #include <string>
 #include <thread>
+#include "../inc/socket_api.h"
 
 int main(void) {
 

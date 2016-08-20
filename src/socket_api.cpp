@@ -5,8 +5,6 @@
  *      Author: janne
  */
 
-#include "../inc/SocketAPI.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -19,6 +17,7 @@
 #include <arpa/inet.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include "../inc/socket_api.h"
 
 int SocketAPI::getServerSocketFileDescriptor(const std::string& portNo) {
 
@@ -135,7 +134,6 @@ int SocketAPI::getClientSocketFileDescriptor(const std::string& address, const s
 }
 
 SocketBuf SocketAPI::receiveData(int fileDescriptor, int noOfBytes) {
-	printf("receiveData expecting %d bytes\n", noOfBytes);
 	SocketBuf retVal;
 	retVal.data = new char[noOfBytes];
 	retVal.dataSize = noOfBytes;
@@ -150,8 +148,6 @@ SocketBuf SocketAPI::receiveData(int fileDescriptor, int noOfBytes) {
 
 		noOfBytes -= numbytes;
     }
-
-    printf("receiveData received %d bytes\n", retVal.dataSize);
 
 	return retVal;
 }

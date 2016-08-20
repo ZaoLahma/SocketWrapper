@@ -5,8 +5,8 @@
  *      Author: janne
  */
 
-#ifndef INC_SOCKETAPI_H_
-#define INC_SOCKETAPI_H_
+#ifndef INC_SOCKET_API_H_
+#define INC_SOCKET_API_H_
 
 #include <string>
 
@@ -37,4 +37,4 @@ private:
 };
 
 
-#endif /* INC_SOCKETAPI_H_ */
+#endif /* INC_SOCKET_API_H_ */
