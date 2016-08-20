@@ -17,6 +17,9 @@ compile:
 link:
 	$(CCOMMAND) -o $(EXE_NAME) ./*.o $(LINKARGS)
 	
+lib: compile
+	ar rvs socketwrapper.a ./*.o	
+	
 clean:
 	rm -rf ./*.o
 	rm ./$(EXE_NAME)
