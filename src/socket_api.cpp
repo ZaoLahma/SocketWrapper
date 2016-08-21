@@ -133,10 +133,10 @@ int SocketAPI::getClientSocketFileDescriptor(const std::string& address, const s
     return sockfd;
 }
 
-SocketBuf SocketAPI::receiveData(int fileDescriptor, int noOfBytes) {
+SocketBuf SocketAPI::receiveData(int fileDescriptor, int noOfBytes, bool expectAllBytes) {
 	SocketBuf retVal;
 	retVal.data = new char[noOfBytes];
-	retVal.dataSize = noOfBytes;
+	retVal.dataSize = 0;
 
     int numbytes = 0;
 
@@ -147,6 +147,10 @@ SocketBuf SocketAPI::receiveData(int fileDescriptor, int noOfBytes) {
 		}
 
 		noOfBytes -= numbytes;
+		retVal.dataSize += numbytes;
+		if(false == expectAllBytes && numbytes == 0) {
+			break;
+		}
     }
 
 	return retVal;
