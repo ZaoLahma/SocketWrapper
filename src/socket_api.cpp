@@ -148,6 +148,7 @@ SocketBuf SocketAPI::receiveData(int fileDescriptor, int noOfBytes, bool expectA
 
 		noOfBytes -= numbytes;
 		retVal.dataSize += numbytes;
+
 		if(false == expectAllBytes && numbytes == 0) {
 			break;
 		}
