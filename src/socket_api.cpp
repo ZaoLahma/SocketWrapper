@@ -80,12 +80,9 @@ int SocketAPI::waitForConnection(int socketFileDescriptor) {
 	struct sockaddr_storage their_addr;
     socklen_t sin_size;
 
-    printf("server: waiting for connections...\n");
-
 	sin_size = sizeof their_addr;
 	int new_fd = accept(socketFileDescriptor, (struct sockaddr *)&their_addr, &sin_size);
 
-	printf("server: got new connection...\n");
     return new_fd;
 }
 
@@ -96,7 +93,6 @@ int SocketAPI::getClientSocketFileDescriptor(const std::string& address, const s
 	struct addrinfo* servinfo;
 	struct addrinfo* p;
     int rv;
-
 
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC;
@@ -142,14 +138,13 @@ SocketBuf SocketAPI::receiveData(int fileDescriptor, int noOfBytes, bool expectA
 
     while(noOfBytes > 0) {
 		if ((numbytes = recv(fileDescriptor, &retVal.data[numbytes], noOfBytes, 0)) == -1) {
-			perror("recv");
-			exit(1);
+			break;
 		}
 
 		noOfBytes -= numbytes;
 		retVal.dataSize += numbytes;
 
-		if(false == expectAllBytes) {
+		if(0 == numbytes || false == expectAllBytes) {
 			break;
 		}
     }
@@ -161,18 +156,23 @@ int SocketAPI::sendData(int fileDescriptor, const SocketBuf& socketBuf) {
 
 	int numBytesToSend = socketBuf.dataSize;
 	int bytesSent = 0;
+	int totalBytesSent = 0;
 
 	while(numBytesToSend > 0) {
 		bytesSent = send(fileDescriptor, socketBuf.data, socketBuf.dataSize, 0);
 		if (bytesSent == -1) {
-			perror("send");
-			return -1;
+			break;
 		}
 
+		totalBytesSent += bytesSent;
 		numBytesToSend -= bytesSent;
+
+		if(0 == bytesSent) {
+			break;
+		}
 	}
 
-	return -1;
+	return totalBytesSent;
 }
 
 void SocketAPI::disconnect(int fileDescriptor)
