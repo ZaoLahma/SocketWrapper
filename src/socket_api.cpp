@@ -34,7 +34,6 @@ int SocketAPI::getServerSocketFileDescriptor(const std::string& portNo) {
     hints.ai_flags = AI_PASSIVE;
 
     if ((rv = getaddrinfo(NULL, portNo.c_str(), &hints, &servinfo)) != 0) {
-        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
         return 1;
     }
 
@@ -42,19 +41,16 @@ int SocketAPI::getServerSocketFileDescriptor(const std::string& portNo) {
     for(p = servinfo; p != NULL; p = p->ai_next) {
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
                 p->ai_protocol)) == -1) {
-            perror("server: socket");
             continue;
         }
 
         if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes,
                 sizeof(int)) == -1) {
-            perror("setsockopt");
             exit(1);
         }
 
         if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
             close(sockfd);
-            perror("server: bind");
             continue;
         }
 
@@ -64,12 +60,10 @@ int SocketAPI::getServerSocketFileDescriptor(const std::string& portNo) {
     freeaddrinfo(servinfo);
 
     if (p == NULL)  {
-        fprintf(stderr, "server: failed to bind\n");
         exit(1);
     }
 
     if (listen(sockfd, 10) == -1) {
-        perror("listen");
         exit(1);
     }
 
@@ -99,20 +93,17 @@ int SocketAPI::getClientSocketFileDescriptor(const std::string& address, const s
     hints.ai_socktype = SOCK_STREAM;
 
     if ((rv = getaddrinfo(address.c_str(), portNo.c_str(), &hints, &servinfo)) != 0) {
-        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
         return 1;
     }
 
     for(p = servinfo; p != NULL; p = p->ai_next) {
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
                 p->ai_protocol)) == -1) {
-            perror("client: socket");
             continue;
         }
 
         if (::connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
             close(sockfd);
-            perror("client: connect");
             continue;
         }
 
@@ -120,7 +111,6 @@ int SocketAPI::getClientSocketFileDescriptor(const std::string& address, const s
     }
 
     if (p == NULL) {
-        fprintf(stderr, "client: failed to connect\n");
         return 2;
     }
 
